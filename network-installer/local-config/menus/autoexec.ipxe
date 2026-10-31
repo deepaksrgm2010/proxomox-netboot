@@ -1,0 +1,3 @@
+#!ipxe
+chain http://${next-server}:8080/assets/menus/local-vars.ipxe
+chain http://${next-server}:8080/assets/menus/custom.ipxe

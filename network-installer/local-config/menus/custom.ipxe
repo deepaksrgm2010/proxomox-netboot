@@ -1,0 +1,12 @@
+#!ipxe
+
+menu Proxmox VE Local Installer
+item pve92iso  Install Proxmox VE 9.2 (ISO/sanboot)
+choose version || goto custom_exit
+
+
+:pve92iso
+sanboot ${live_endpoint_local}/proxmox/9.2/proxmox.iso 
+
+:custom_exit
+chain menu.ipxe

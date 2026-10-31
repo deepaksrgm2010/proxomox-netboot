@@ -1,0 +1,35 @@
+FROM debian:bookworm-slim
+
+ARG ISO_FILE=proxmox.iso
+ARG ANSWER_FILE=default.toml
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        wget gnupg ca-certificates && \
+    wget -qO /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg \
+        http://download.proxmox.com/debian/proxmox-release-bookworm.gpg && \
+    echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" \
+        > /etc/apt/sources.list.d/pve.list && \
+    apt-get update && apt-get install -y --no-install-recommends \
+        proxmox-auto-install-assistant xorriso zstd cpio && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV ISO_FILE=${ISO_FILE}
+ENV ANSWER_FILE=${ANSWER_FILE}
+ENV ANSWER_URL='http://0.0.0.0:8080/proxmox/9.2/default.toml'
+ #--answer-file "/srv/input/${ANSWER_FILE}" \
+     
+CMD sh -c ' \
+  proxmox-auto-install-assistant prepare-iso "/srv/input/${ISO_FILE}" \
+      --fetch-from http \
+      --url "$ANSWER_URL" \
+      --output /srv/output/prepared.iso && \
+  xorriso -indev /srv/output/prepared.iso -osirrox on \
+      -extract boot/linux26   /srv/output/linux26   2>/dev/null ; \
+  xorriso -indev /srv/output/prepared.iso -osirrox on \
+      -extract boot/initrd.img /tmp/initrd.zst 2>/dev/null ; \
+  zstd -d /tmp/initrd.zst -c | gzip -5 > /tmp/initrd.img && \
+  cp /srv/output/prepared.iso /tmp/proxmox.iso && \
+  (cd /tmp && echo proxmox.iso | cpio -H newc -o -R 0:0 --quiet) > /tmp/iso.cpio && \
+  cat /tmp/initrd.img /tmp/iso.cpio > /srv/output/initrd.img && \
+  cp /srv/output/prepared.iso /srv/output/proxmox.iso && \
+  rm /tmp/initrd.zst /tmp/initrd.img /tmp/iso.cpio /srv/output/prepared.iso'

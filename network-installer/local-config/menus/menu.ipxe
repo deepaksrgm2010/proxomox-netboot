@@ -1,0 +1,4 @@
+#!ipxe
+
+chain custom.ipxe || goto error
+goto main_menu

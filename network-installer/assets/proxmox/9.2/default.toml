@@ -1,0 +1,15 @@
+[global]
+keyboard = "en-us"
+country = "de"
+fqdn = "pve.local"
+mailto = "deepaksrgm2010@gmail.com"
+timezone = "Europe/Berlin"
+root-password = "$6$An63EQqqlDzP.rdA$q8lku8ir0xco7215sP0TlI1EACFJlMWWmN4juQdGGG/nFILT6Zwkl0vCLvh5Y6RaIqfImd/vIQlxKOOt7jjD41"
+root-ssh-keys = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILWWrhkIVdmdG0h1bJQlnXIQmYmyvPaXaqs6Rd0doVPI thinky@thinky"]
+
+[network]
+source = "from-dhcp"
+
+[disk-setup]
+filesystem = "ext4"
+disk-list = ["sda"]
